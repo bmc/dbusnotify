@@ -1,0 +1,103 @@
+#!/usr/bin/env ruby
+#
+# See the man page or http://software.clapper.org/dbusnotify/
+# for documentation.
+#--
+# This software is released under a BSD license, adapted from
+# http://opensource.org/licenses/bsd-license.php
+#
+# Copyright (c) 2011, Brian M. Clapper
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+#
+# * Redistributions in binary form must reproduce the above copyright
+#   notice, this list of conditions and the following disclaimer in the
+#   documentation and/or other materials provided with the distribution.
+#
+# * Neither the name "clapper.org" nor the names of its contributors may be
+#   used to endorse or promote products derived from this software without
+#   specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+# IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#++
+
+require 'rubygems'
+require 'dbus'
+require 'optparse'
+require 'dbusnotify'
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+options =
+{
+  :app     => "dbusnotify",
+  :icon    => nil,
+  :title   => "Alert",
+  :timeout => -1
+}
+  
+error = nil
+option_parser = OptionParser.new do |opts|
+  opts.program_name = 'dbusnotify'
+  opts.banner = "Usage: #{opts.program_name} [OPTIONS] string ..."
+  opts.separator ''
+  opts.separator 'OPTIONS'
+
+  opts.on("-a app", "--app app",
+          "Name of application. Default: #{options[:app]}") do |a|
+    options[:app] = a
+  end
+
+  opts.on("-i path", "--icon path", "Path to icon. Default: No icon.}") do |p|
+    if not File.exist? p
+      error = "Icon file \"#{p}\" does not exist."
+    end
+    options[:icon] = p
+  end
+
+  opts.on("-t title", "--title title",
+          "Title for DBUS message. Default: #{options[:title]}") do |title|
+    options[:title] = title
+  end
+
+  opts.on("-T timeout", "--timeout timeout", "How long to display.") do |n|
+    if n !~ /^-?\d+$/
+      error = "Non-numeric parameter \"#{n}\" to -n option."
+    end
+    options[:timeout] = n.to_i
+  end
+
+end
+
+begin
+  option_parser.parse!(ARGV)
+rescue OptionParser::InvalidOption => ex
+  error = ex.to_s
+end
+
+if error || ARGV.length == 0
+  $stderr.puts(error) unless error.nil?
+  option_parser.display
+  exit 1
+end
+
+n = DBusNotifier.new(options[:app], options[:icon])
+n.notify(options[:title], ARGV.join(" "), options[:timeout])
