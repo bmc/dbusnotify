@@ -17,9 +17,9 @@ For installation instructions and additional documentation, see the
 
 For a complete description, see the [man page][].
 
-It can be installed as a gem. It uses the [`ruby-dbus`][] gem.
+It can be installed as a gem. It uses the [ruby-dbus][] gem.
 
-[`ruby-dbus`]: https://github.com/mvidner/ruby-dbus/
+[ruby-dbus]: https://github.com/mvidner/ruby-dbus/
 
 # Installation
 
