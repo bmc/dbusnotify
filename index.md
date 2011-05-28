@@ -17,7 +17,9 @@ For installation instructions and additional documentation, see the
 
 For a complete description, see the [man page][].
 
-It can be installed as a gem.
+It can be installed as a gem. It uses the [`ruby-dbus`] gem.
+
+[`ruby-dbus`]: https://github.com/mvidner/ruby-dbus/
 
 # Installation
 
@@ -27,8 +29,9 @@ It can be installed as a gem.
 
 ## From source
 
-First, ensure that you have both `rubygems` and `rake` installed. Then, either
-clone the [git repository][] or [download the source][] and unpack it. Then:
+First, ensure that you have `rubygems`, `rake` and `ruby-dbus` installed.
+Then, either clone the [git repository][] or [download the source][] and
+unpack it. Then:
 
     $ cd dbusnotify
     $ rake install
